@@ -18,7 +18,6 @@ HEADERS = {
     "Accept": "application/json",
 }
 
-from typing import Optional
 from fastapi import HTTPException
 
 

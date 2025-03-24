@@ -1,8 +1,9 @@
 from datetime import datetime
-from bson import ObjectId
-from fastapi import FastAPI, Depends, HTTPException, status
-from fastapi.middleware.cors import CORSMiddleware
+
 import httpx
+from bson import ObjectId
+from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from auth_utils import create_token, get_current_user, hash_password, verify_password
 from db import users_collection, ratings_collection
@@ -20,6 +21,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # ---------------------------
 # Helpers
 # ---------------------------
@@ -30,6 +32,7 @@ async def get_partner_score(restaurant_id: str) -> float | None:
         return sum(r["rating"] for r in ratings) / len(ratings)
     return None
 
+
 def format_review(rating_doc):
     return {
         "id": str(rating_doc["_id"]),
@@ -38,6 +41,7 @@ def format_review(rating_doc):
         "rating": rating_doc["rating"],
         "comment": rating_doc.get("comment", "")
     }
+
 
 async def get_curated_results(yelp_results):
     curated = []
@@ -53,6 +57,7 @@ async def get_curated_results(yelp_results):
         curated.append(r)
     return curated
 
+
 # ---------------------------
 # Routes
 # ---------------------------
@@ -66,6 +71,7 @@ async def register(user: User):
     await users_collection.insert_one({"username": user.username, "password": hashed_pw})
     return {"message": "User created"}
 
+
 @app.post("/login")
 async def login(user: User):
     db_user = await users_collection.find_one({"username": user.username})
@@ -75,6 +81,7 @@ async def login(user: User):
     token = create_token(str(db_user["_id"]))
     return {"token": token}
 
+
 @app.get("/restaurants")
 async def get_restaurants(params: SearchParams = Depends()):
     params.categories = f"restaurants,{params.categories}" if params.categories else "restaurants"
@@ -82,6 +89,7 @@ async def get_restaurants(params: SearchParams = Depends()):
     curated = await get_curated_results(yelp_results)
     curated.sort(key=lambda r: (r.get("partner_score") or 0, r.get("rating", 0)), reverse=True)
     return {"restaurants": curated}
+
 
 @app.get("/restaurant/{restaurant_id}")
 async def get_restaurant_detail(restaurant_id: str):
@@ -98,6 +106,7 @@ async def get_restaurant_detail(restaurant_id: str):
         "partner_comments": [format_review(r) for r in reviews if r.get("comment")],
     }
 
+
 @app.post("/rate")
 async def rate_restaurant(rating: Rating, user=Depends(get_current_user)):
     rating_doc = {
@@ -110,6 +119,7 @@ async def rate_restaurant(rating: Rating, user=Depends(get_current_user)):
     }
     await ratings_collection.insert_one(rating_doc)
     return {"message": "Rating submitted successfully"}
+
 
 @app.delete("/rate/{rating_id}")
 async def delete_rating(rating_id: str, user=Depends(get_current_user)):

@@ -1,14 +1,13 @@
+import os
 from datetime import datetime, timedelta
 
 import jwt
 from bson import ObjectId
+from dotenv import load_dotenv
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from starlette import status
-import os
 from passlib.context import CryptContext
-
-from dotenv import load_dotenv
+from starlette import status
 
 from db import users_collection
 
@@ -30,7 +29,7 @@ def create_token(user_id: str):
 
 def decode_token(token: str):
     try:
-        res =  jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        res = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         print("res is: ", res)
         return res
     except jwt.PyJWTError:
