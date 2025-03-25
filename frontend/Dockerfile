@@ -1,20 +1,23 @@
-FROM node:14-alpine as build
+FROM node:18-alpine AS build
 
 WORKDIR /app
 
-COPY package.json .
+COPY package.json ./
+COPY . .
 
 RUN npm install
 
-COPY . .
+ARG NODE_ENV
+ENV NODE_ENV=$NODE_ENV
+
+
+RUN if [ "$NODE_ENV" != "production" ]; then rm .env.production; fi
 
 RUN npm run build
 
 FROM nginx:stable-alpine
-
+COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-COPY --from=build /app/build /usr/share/nginx/html
 
 EXPOSE 80
 
