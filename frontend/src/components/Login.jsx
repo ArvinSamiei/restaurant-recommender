@@ -37,7 +37,7 @@ export default function Login() {
       <input
         type="email"
         className="w-full border mb-2 p-2"
-        placeholder="Email"
+        placeholder="Username"
         onChange={(e) => setUsername(e.target.value)}
         value={username}
       />
