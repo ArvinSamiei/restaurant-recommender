@@ -38,6 +38,8 @@ export const Home = () => {
     dispatch(setLocation(undefined));
     return () => {
       dispatch(setLocation(undefined));
+      setTerm("");
+      setPrice("");
     };
   }, []);
 
