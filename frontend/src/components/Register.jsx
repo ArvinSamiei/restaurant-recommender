@@ -6,12 +6,17 @@ import { register } from "../api";
 export default function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
 
   const handleRegister = async () => {
     try {
+      if (password != passwordConfirm) {
+        setError("Passwords do not match.");
+        return;
+      }
       await register({ username, password });
       setError("");
       setSuccess(true);
@@ -55,6 +60,13 @@ export default function Register() {
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+      />
+      <input
+        type="password"
+        className="w-full border mb-4 p-2"
+        placeholder="Reenter Password"
+        value={passwordConfirm}
+        onChange={(e) => setPasswordConfirm(e.target.value)}
       />
       <button
         onClick={handleRegister}
