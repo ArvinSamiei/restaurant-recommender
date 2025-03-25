@@ -7,11 +7,9 @@ COPY . .
 
 RUN npm install
 
-ARG NODE_ENV
-ENV NODE_ENV=$NODE_ENV
+ARG VITE_API_URL
+RUN echo "VITE_API_URL=$VITE_API_URL" > .env && npm install && npm run build
 
-
-RUN if [ "$NODE_ENV" != "production" ]; then rm .env.production; fi
 
 RUN npm run build
 
